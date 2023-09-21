@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import { Embed, useIsEmbeddable } from '@emweb/react';
 import React, {
   useState, useEffect, useCallback, useRef,
 } from 'react';
@@ -204,6 +205,11 @@ const MessageBody = React.memo(({
   isEdited,
   msgType,
 }) => {
+  const isEmbeddable = useIsEmbeddable(body);
+  if (isEmbeddable) {
+    return <Embed url={body} />;
+  }
+
   // if body is not string it is a React element.
   if (typeof body !== 'string') return <div className="message__body">{body}</div>;
 
