@@ -24,6 +24,7 @@ import {
 } from 'matrix-js-sdk';
 import parse, { HTMLReactParserOptions } from 'html-react-parser';
 import classNames from 'classnames';
+import { Embed, useIsEmbeddable } from '@emweb/react';
 import { ReactEditor } from 'slate-react';
 import { Editor } from 'slate';
 import to from 'await-to-js';
@@ -171,6 +172,11 @@ const TimelineDivider = as<'div', { variant?: ContainerColor | 'Inherit' }>(
     </Box>
   )
 );
+
+const OptionalEmbed = ({ body, children }: { body: string; children: React.ReactNode }) => {
+  const isEmbeddable = useIsEmbeddable(body);
+  return isEmbeddable ? <Embed url={body} /> : children;
+};
 
 export const getLiveTimeline = (room: Room): EventTimeline =>
   room.getUnfilteredTimelineSet().getLiveTimeline();
@@ -1010,7 +1016,7 @@ export function RoomTimeline({ room, eventId, roomInputRef, editor }: RoomTimeli
       const urls = urlsMatch ? [...new Set(urlsMatch)] : undefined;
 
       return (
-        <>
+        <OptionalEmbed body={body}>
           <MessageTextBody
             preWrap={typeof customBody !== 'string'}
             jumboEmoji={JUMBO_EMOJI_REG.test(trimmedBody)}
@@ -1025,7 +1031,7 @@ export function RoomTimeline({ room, eventId, roomInputRef, editor }: RoomTimeli
               ))}
             </UrlPreviewHolder>
           )}
-        </>
+        </OptionalEmbed>
       );
     },
     renderEmote: (mEventId, mEvent, timelineSet) => {
